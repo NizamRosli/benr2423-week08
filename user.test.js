@@ -15,10 +15,10 @@ describe("User Account Management", () => {
 		await client.close();
 	})
 
-	test("New user registration", async () => {
-		const res = await User.register("bosando", "password")
-		expect(res).toBe(1)
-	})
+	// test("New user registration", async () => {
+	// 	const res = await User.register("tah", "password")
+	// 	expect(res).toBe(1)
+	// })
 
 	test("Duplicate username", async () => {
 		const res = await User.register("test", "test")

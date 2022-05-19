@@ -32,6 +32,7 @@ app.post('/login', async (req, res) => {
 	console.log(req.body);
 
 	const user = await User.login(req.body.username, req.body.password);
+	console.log(user);
 
 	res.json({
 		_id: '123456',
@@ -43,11 +44,14 @@ app.post('/login', async (req, res) => {
 app.post('/register', async (req, res) => {
 	console.log(req.body);
 
-	// res.json({
-	// 	_id: '123456',
-	// 	name: 'test',
-	// 	age: 18,
-	// })
+	const reg = await User.register(req.body.username, req.body.password);
+	console.log(reg);
+
+	res.json({
+		_id: '123456',
+		name: 'test',
+		age: 18,
+	})
 })
 
 app.listen(port, () => {
