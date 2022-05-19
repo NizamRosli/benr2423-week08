@@ -1,15 +1,15 @@
 const supertest = require('supertest');
-const request = supertest('http://localhost:3000');
+const request = supertest('http://localhost:3030');
 
 describe('Express Route Test', function () {
-	// it('should return hello world', async () => {
-	// 	return request.get('/hello')
-	// 		.expect(200)
-	// 		.expect('Content-Type', /text/)
-	// 		.then(res => {
-	// 			expect(res.text).toBe('Hello BENR2423');
-	// 		});
-	// })
+	it('should return hello world', async () => {
+		return request.get('/hello')
+			.expect(200)
+			.expect('Content-Type', /text/)
+			.then(res => {
+				expect(res.text).toBe('Hello BENR2423');
+			});
+	})
 
 	it('login successfully', async () => {
 		return request
@@ -19,20 +19,20 @@ describe('Express Route Test', function () {
 			.expect(200).then(response => {
 				expect(response.body).toEqual(
 					expect.objectContaining({
-						// _id: expect.any(String),
-						// name: expect.any(String),
-						// age: expect.any(Number),
+						_id: expect.any(String),
+						name: expect.any(String),
+						age: expect.any(Number),
 					})
 				);
 			});
 	});
 
-	it('login failed', async () => {
-	})
+	// it('login failed', async () => {
+	// })
 
-	it('register', async () => {
-	});
+	// it('register', async () => {
+	// });
 
-	it('register failed', async () => {
-	})
+	// it('register failed', async () => {
+	// })
 });

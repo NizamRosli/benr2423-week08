@@ -3,7 +3,7 @@ const User = require("./user");
 
 MongoClient.connect(
 	// TODO: Connection 
-	"my-mongodb+srv-connection-string",
+	"mongodb+srv://m001-student:m001-mongodb-basics@sandbox.can3v.mongodb.net",
 	{ useNewUrlParser: true },
 ).catch(err => {
 	console.error(err.stack)
@@ -15,7 +15,7 @@ MongoClient.connect(
 
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3030
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -33,11 +33,11 @@ app.post('/login', async (req, res) => {
 
 	const user = await User.login(req.body.username, req.body.password);
 
-	// res.json({
-	// 	_id: '123456',
-	// 	name: 'test',
-	// 	age: 18,
-	// })
+	res.json({
+		_id: '123456',
+		name: 'test',
+		age: 18,
+	})
 })
 
 app.post('/register', async (req, res) => {
@@ -51,5 +51,5 @@ app.post('/register', async (req, res) => {
 })
 
 app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`)
+	console.log(`Example app listening at http://localhost:${port}`)
 })
