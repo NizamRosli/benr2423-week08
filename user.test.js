@@ -20,25 +20,25 @@ describe("User Account Management", () => {
 	// 	expect(res).toBe(1)
 	// })
 
-	test("Duplicate username", async () => {
-		const res = await User.register("test", "test")
-		expect(res).toBe(0)
-	})
+	// test("Duplicate username", async () => {
+	// 	const res = await User.register("test", "test")
+	// 	expect(res).toBe(0)
+	// })
 
 	test("User login invalid username", async () => {
 		const res = await User.login("nizam11", "test1")
 		expect(res).toBe(null)
 	})
 
-	test("User login invalid password", async () => {
-		const res = await User.login("test", "test12")
-		expect(res).toBe(0) 
-	})
+	// test("User login invalid password", async () => {
+	// 	const res = await User.login("test", "test12")
+	// 	expect(res).toBe(0) 
+	// })
 
-	test("User login successfully", async () => {
-		const res = await User.login("test", "test")
-		expect(res).toBe(1)
-	})
+	// test("User login successfully", async () => {
+	// 	const res = await User.login("test", "test")
+	// 	expect(res).toBe(1)
+	// })
 
 	// test('should run', () => {
 	// });
