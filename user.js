@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt")
 let users;
 
 class User {
@@ -13,72 +14,67 @@ class User {
 	 * @param {*} password 
 	 * @param {*} phone 
 	 */
-	 static async register(username, password) {
+	static async register(username, password, name, officerno, rank, phone) {
 		// TODO: Check if username exists
-		let res = await users.findOne({'userName':username});
-			//console.log(username)
-			//console.log(res);
-			if (res == null){
-				// TODO: Hash password
-				const bcrypt = require("bcrypt")
-				const saltRounds = 10;
-				bcrypt.genSalt(saltRounds, function (saltError, salt) {
-					if (saltError) {
-						throw saltError
-					} else {
-						bcrypt.hash(password, salt, function(hashError, hash) {
-							if (hashError) {
-								throw hashError
-							}  else {
+		const res = await users.findOne({'username':username});
+			if (res){
+				return { status: "Duplicate Username"}
+			}
+			// TODO: Hash password
+			const salt = await bcrypt.genSalt(10);
+			const hash = await bcrypt.hash(password, salt)
 			// TODO: Save user to database
-								users.insertOne({
-									"userName": username,
-									"Password": password,
-									"HashedPassword": hash});
-							}
-							console.log("Inserted!!!")
-							
+				return await users.insertOne({
+							"username": username,
+							"Password": password,
+							"HashedPassword": hash,
+							"Name": name,
+							"OfficerNo": officerno,
+							"Rank": rank,
+							"Phone": phone,});
+	}
 
-						})
-					
-					}
-				}); return 1;
-			}
-			else{
-				console.log("Please choose other username!")
-				return 0;
-			}
-			
-		 }
 
-		 static async login(username, password) {
+	static async login(username, password) {
 			// TODO: Check if username exists
-			let result = await users.findOne({'userName':username});
-				//console.log(result)
-				//console.log(result[0].Password)
-				if (result == null){
-					return null
+			const result = await users.findOne({'username':username});
+				if (!result){
+					return { status: "Invalid Username"};
 				}
-				else{
-				// TODO: Validate password
-				const bcrypt = require("bcrypt")
-				let com = await bcrypt.compare(password, result.HashedPassword)
-					//result == true
-					//console.log(result);
-					if (com == true){
-						console.log("Login Successfully!")
-						return 1;
-					}
-					else{
-						console.log("Login failed!")
-						return 0;
-					}
-				
+
+			// TODO: Validate password
+				const com = await bcrypt.compare(password, result.HashedPassword)
+				if (!com){
+					return { status: "Invalid Password"};
 				}
-	
 			// TODO: Return user object
-			
+				return users;
+				
+	}
+	
+		static async update(name, phone, email){
+			const result = await users.findOne({'username':username});
+			if (!result){
+				return { status: "Invalid Username"};
+			}
+			const com = await bcrypt.compare(password, result.HashedPassword)
+			if (!com){
+				return { status: "Invalid Password"};
+					}
+				return users.updateOne({
+					"username": username,
+					"Password": password,
+					"HashedPassword": hash,
+					"Name": name,
+					"OfficerNo": officerno,
+					"Rank": rank,
+					"Phone": phone,})
 		}
+
+		static async delete(username) {
+			return users.deleteOne({username: username})
+		}
+
 	}
 
 
