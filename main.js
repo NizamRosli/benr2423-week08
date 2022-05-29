@@ -15,7 +15,7 @@ MongoClient.connect(
 
 const express = require('express')
 const app = express()
-const port = 3030
+const port = process.env.PORT || 3030
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -88,9 +88,11 @@ app.post('/login', async (req, res) => {
 	console.log(req.body);
 
 	let user = await User.login(req.body.username, req.body.password);
-	console.log(user.status);
-	if (user.status == 'Invalid Username') {
-		res.status(401).send("Invalid username or password");
+	// console.log(user);
+	// console.log(user.status);
+	
+	if (user.status == ("invalid username" || "invalid password")) {
+		res.status(401).send("invalid username or password");
 		return
 	}
 
@@ -101,7 +103,7 @@ app.post('/login', async (req, res) => {
 		rank: user.Rank,
 		phone: user.Phone,
 
-	})
+	});
 })
 
 /**
@@ -148,18 +150,60 @@ app.post('/register', async (req, res) => {
 	res.json({reg})
 })
 
+/**
+ * @swagger
+ * /login/update:
+ *   patch:
+ *     description: User Update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               name: 
+ *                 type: string
+ *               officerNo: 
+ *                 type: integer
+ *               rank: 
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful update the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Invalid username or password
+ */
+
 app.patch('/login/update', async (req, res) => {
 	console.log(req.body);
 
 	const log = await User.login(req.body.username, req.body.password);
+	//console.log(log.status);
 
-	if (log == 1){
-		const update = await User.update(req.body.Name, req.body.Phone, req.body.Email);
-		res.json({update})
+	if (log.status == ('invalid username' || 'invalid password')) {
+		res.status(401).send("invalid username or password")
 	}
-	else{
-		res.status(401, "invalid username or password!")
-	} 
+	const update = await User.update(req.body.username,req.body.name, req.body.officerno, req.body.rank, req.body.phone);
+	res.json({update}) 
+
+})
+
+app.delete('/delete', async (req, res) => {
+	const del = await User.delete(req.body.username)
+
+	res.json({del})
+
 })
 
 /**
