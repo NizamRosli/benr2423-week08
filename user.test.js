@@ -12,33 +12,45 @@ describe("User Account Management", () => {
 	})
 
 	afterAll(async () => {
+		await User.delete("test");
 		await client.close();
 	})
 
-	// test("New user registration", async () => {
-	// 	const res = await User.register("tah", "password")
-	// 	expect(res).toBe(1)
-	// })
-
-	// test("Duplicate username", async () => {
-	// 	const res = await User.register("test", "test")
-	// 	expect(res).toBe(0)
-	// })
-
-	test("User login invalid username", async () => {
-		const res = await User.login("nizam11", "test1")
-		expect(res).toBe(null)
+	test("New user registration", async () => {
+		const res = await User.register("test", "password", "nizam", 345, "admin", "0123456789")
+		expect(res.insertedId).not.toBeUndefined();
 	})
 
-	// test("User login invalid password", async () => {
-	// 	const res = await User.login("test", "test12")
-	// 	expect(res).toBe(0) 
-	// })
+	test("Duplicate username", async () => {
+		const res = await User.register("test", "password")
+		expect(res).toEqual({ "status": "duplicate username" })
+	})
 
-	// test("User login successfully", async () => {
-	// 	const res = await User.login("test", "test")
-	// 	expect(res).toBe(1)
-	// })
+	test("User login invalid username", async () => {
+		const res = await User.login("test-fail", "password")
+		expect(res).toEqual({ "status": "invalid username" })
+	})
+
+	test("User login invalid password", async () => {
+		const res = await User.login("test", "test123")
+		expect(res).toEqual({ "status": "invalid password" }) 
+	})
+
+	test("User login successfully", async () => {
+		const res = await User.login("test", "password")
+		expect(res).not.toEqual(
+			expect.objectContaining({
+				_id: expect.any(String),
+				username: expect.any(String),
+        Password: expect.any(String),
+				HashedPassword: expect.any(String),
+        Name: expect.any(String),
+        //OfficerNo: expect.any(Int32Array),
+        Rank: expect.any(String),
+        Phone: expect.any(String),
+			})
+		);
+	})
 
 	// test('should run', () => {
 	// });

@@ -1,9 +1,9 @@
 const bcrypt = require("bcrypt")
-let users;
+let visitors;
 
-class User {
+class Visitor {
 	static async injectDB(conn) {
-		users = await conn.db("Prison_VMS").collection("users")
+		visitors = await conn.db("Prison_VMS").collection("visitors")
 	}
 
 	/**
@@ -14,9 +14,9 @@ class User {
 	 * @param {*} password 
 	 * @param {*} phone 
 	 */
-	static async register(username, password, name, officerno, rank, phone) {
+	static async register(username, password, name, age, gender, address, relation) {
 		// TODO: Check if username exists
-		const res = await users.findOne({ username: username })
+		const res = await visitors.findOne({ username: username })
 
 			if (res){
 				return { status: "duplicate username"}
@@ -27,20 +27,22 @@ class User {
 			const hash = await bcrypt.hash(password, salt)
 
 			// TODO: Save user to database
-				return await users.insertOne({
+				return await visitors.insertOne({
 							"username": username,
 							"Password": password,
 							"HashedPassword": hash,
 							"Name": name,
-							"OfficerNo": officerno,
-							"Rank": rank,
-							"Phone": phone,});
+							"Age": age,
+							"Gender": gender,
+							"Address": address,
+              "Relation": relation
+            });
 	}
 
 
 	static async login(username, password) {
 			// TODO: Check if username exists
-			const result = await users.findOne({username: username});
+			const result = await visitors.findOne({username: username});
 
 				if (!result) {
 					return { status: "invalid username" }
@@ -56,19 +58,20 @@ class User {
 				
 	}
 	
-		static async update(username, name, officerno, rank, phone){
-				return users.updateOne({username:username},{$set:{
+		static async update(username, name, age, gender, address, relation){
+				return visitors.updateOne({username:username},{$set:{
 				"Name": name,
-				"OfficerNo": officerno,
-				"Rank": rank,
-				"Phone": phone,}})
+				"Age": age,
+				"Gender": gender,
+				"Address": address,
+        "Relation": relation}})
 		}
 
 		static async delete(username) {
-			return users.deleteOne({username: username})
+			return visitors.deleteOne({username: username})
 		}
 
 	}
 
 
-module.exports = User;
+module.exports = Visitor;

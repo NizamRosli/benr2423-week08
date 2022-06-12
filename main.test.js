@@ -11,17 +11,38 @@ describe('Express Route Test', function () {
 			});
 	})
 
-	it('login successfully', async () => {
+	it('user login successfully', async () => {
 		return request
-			.post('/login')
-			.send({username: 'test', password: "test" })
+			.post('/login/user')
+			.send({username: "string", password: "string" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
 				expect(response.body).toEqual(
 					expect.objectContaining({
-						_id: expect.any(String),
+						username: expect.any(String),
 						name: expect.any(String),
-						age: expect.any(Number),
+						rank: expect.any(String),
+						phone: expect.any(String),
+						token: expect.any(String),
+					})
+				);
+			});
+	});
+
+	it('user login successfully', async () => {
+		return request
+			.post('/login/visitor')
+			.send({username: "helloworld", password: "string" })
+			.expect('Content-Type', /json/)
+			.expect(200).then(response => {
+				expect(response.body).toEqual(  
+					expect.objectContaining({
+						username: expect.any(String),
+						name: expect.any(String),
+						//age: expect.any(int32),
+						gender: expect.any(String),
+						address: expect.any(String),
+						relation: expect.any(String),
 					})
 				);
 			});
@@ -30,39 +51,64 @@ describe('Express Route Test', function () {
 	// it('login failed', async () => {
 	// })
 
-	it('register', async () => {
+	it('register user', async () => {
 		return request
-			.post('/register')
-			.send({username: 'user6', password: "test" })
+			.post('/register/user')
+			.send({
+				username: "testing",
+				password: "password",
+				name: "azrin",
+				officerno: 756,
+				rank: "user",
+				phone: "0178456789" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
-				expect(response.body).toEqual(
+				expect(response.body).not.toEqual(
 					expect.objectContaining({
-						_id: expect.any(String),
-						name: expect.any(String),
-						age: expect.any(Number),
+						insertedId: expect.any(String),
 					})
 				);
 			});
 	});
 
-	it('login successfully', async () => {
+	it('register visitor', async () => {
 		return request
-			.post('/login/update')
-			.send({username: 'user1', password: "test" })
-			.send({Name: 'Nizam', Phone: '0136797035', Email: 'nizamrosli.nr99@gmail.com'})
-			.expect('Content-Type', /text/)
+			.post('/register/user')
+			.send({
+				username: "testing",
+				password: "password",
+				name: "aishah",
+				age: 23,
+				gender: "female",
+				address: "no 2 jalan tuah 76100 melaka",
+				relation: "husband" })
+			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
-				expect(response.body).toEqual(
+				expect(response.body).not.toEqual(
 					expect.objectContaining({
-						_id: expect.any(String),
-						Name: expect.any(String),
-						Phone: expect.any(Number),
-						Email: expect.any(Number),
+						insertedId: expect.any(String),
 					})
 				);
 			});
 	});
+
+	// it('login successfully', async () => {
+	// 	return request
+	// 		.patch('/login/update')
+	// 		.send({username: 'user1', password: "test" })
+	// 		.send({name: 'Nizam', phone: '0136797035', officeno: '1234'})
+	// 		.expect('Content-Type', /json/)
+	// 		.expect(200).then(response => {
+	// 			expect(response.body).toEqual(
+	// 				expect.objectContaining({
+	// 					_id: expect.any(String),
+	// 					Name: expect.any(String),
+	// 					Phone: expect.any(Number),
+	// 					Email: expect.any(Number),
+	// 				})
+	// 			);
+	// 		});
+	// });
 
 	// it('register failed', async () => {
 	// })

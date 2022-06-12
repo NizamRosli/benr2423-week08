@@ -1,5 +1,6 @@
 const MongoClient = require("mongodb").MongoClient;
 const User = require("./user");
+const Visitor = require("./visitor");
 
 MongoClient.connect(
 	// TODO: Connection 
@@ -11,26 +12,34 @@ MongoClient.connect(
 }).then(async client => {
 	console.log('Connected to MongoDB');
 	User.injectDB(client);
+	Visitor.injectDB(client);
 })
 
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3030
 
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const options = {
-	definition: {
-		openapi: '3.0.0',
-		info: {
-			title: 'MyVMS API for Prison',
-			version: '1.0.0',
-		},
-	},
-	apis: ['./main.js'], // files containing annotations as above
-};
-const swaggerSpec = swaggerJsdoc(options);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const jwt = require ('jsonwebtoken');
+function generateAccessToken(payload){
+	return jwt.sign(payload, "secretcode", { expiresIn: '1h' });
+}
+
+function verifyToken(req, res, next) {
+	const authHeader = req.headers['authorization']
+	const token = authHeader && authHeader.split(' ')[1]
+
+	if (token == null) return res.sendStatus(401)
+
+	jwt.verify(token, "secretcode", (err, user) => {
+		console.log(err);
+
+		if (err) return res.sendStatus(403)
+
+		req.user = user
+
+		next()
+	})
+}
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -43,53 +52,10 @@ app.get('/hello', (req, res) => {
 	res.send('Hello BENR2423')
 })
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         _id: 
- *           type: string
- *         username: 
- *           type: string
- *         phone: 
- *           type: string
- */
-
-/**
- * @swagger
- * /login:
- *   post:
- *     description: User Login
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema: 
- *             type: object
- *             properties:
- *               username: 
- *                 type: string
- *               password: 
- *                 type: string
- *     responses:
- *       200:
- *         description: Successful login
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       401:
- *         description: Invalid username or password
- */
-app.post('/login', async (req, res) => {
+app.post('/login/user', async (req, res) => {
 	console.log(req.body);
 
 	let user = await User.login(req.body.username, req.body.password);
-	// console.log(user);
-	// console.log(user.status);
 	
 	if (user.status == ("invalid username" || "invalid password")) {
 		res.status(401).send("invalid username or password");
@@ -102,46 +68,34 @@ app.post('/login', async (req, res) => {
 		officerNo: user.officerNo,
 		rank: user.Rank,
 		phone: user.Phone,
+		token: generateAccessToken({ rank: user.Rank })
 
 	});
 })
 
-/**
- * @swagger
- * /register:
- *   post:
- *     description: User Register
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema: 
- *             type: object
- *             properties:
- *               username: 
- *                 type: string
- *               password: 
- *                 type: string
- *               name: 
- *                 type: string
- *               officerNo: 
- *                 type: integer
- *               rank: 
- *                 type: string
- *               phone:
- *                 type: string
- *     responses:
- *       200:
- *         description: Successful Register new user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       401:
- *         description: Invalid username or password
- */
+app.post('/login/visitor', async (req, res) => {
+	console.log(req.body);
 
-app.post('/register', async (req, res) => {
+	let user = await Visitor.login(req.body.username, req.body.password);
+	// console.log(user);
+	// console.log(user.status);
+	
+	if (user.status == ("invalid username" || "invalid password")) {
+		res.status(401).send("invalid username or password");
+		return
+	}
+
+	res.status(200).json({
+		username: user.username,
+		name: user.Name,
+		age: user.Age,
+		gender: user.Gender,
+		address: user.Address,
+		relation: user.Relation
+	});
+})
+
+app.post('/register/user', async (req, res) => {
 	console.log(req.body);
 
 	const reg = await User.register(req.body.username, req.body.password, req.body.name, req.body.officerno, req.body.rank, req.body.phone);
@@ -150,40 +104,14 @@ app.post('/register', async (req, res) => {
 	res.json({reg})
 })
 
-/**
- * @swagger
- * /login/update:
- *   patch:
- *     description: User Update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema: 
- *             type: object
- *             properties:
- *               username: 
- *                 type: string
- *               password: 
- *                 type: string
- *               name: 
- *                 type: string
- *               officerNo: 
- *                 type: integer
- *               rank: 
- *                 type: string
- *               phone:
- *                 type: string
- *     responses:
- *       200:
- *         description: Successful update the user
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       401:
- *         description: Invalid username or password
- */
+app.post('/register/visitor', async (req, res) => {
+	console.log(req.body);
+
+	const reg = await Visitor.register(req.body.username, req.body.password, req.body.name, req.body.age, req.body.gender, req.body.address, req.body.relation);
+	console.log(reg);
+
+	res.json({reg})
+})
 
 app.patch('/login/update', async (req, res) => {
 	console.log(req.body);
@@ -195,31 +123,27 @@ app.patch('/login/update', async (req, res) => {
 		res.status(401).send("invalid username or password")
 	}
 	const update = await User.update(req.body.username,req.body.name, req.body.officerno, req.body.rank, req.body.phone);
-	res.json({update}) 
+	res.json({update})
 
 })
 
-app.delete('/delete', async (req, res) => {
+app.use(verifyToken);
+
+app.delete('/delete/user', async (req, res) => {
 	const del = await User.delete(req.body.username)
 
 	res.json({del})
 
 })
 
-/**
- * @swagger
- * /visitor/{id}:
- *   get:
- *     description: Get visitor by id
- *     parameters:
- *       - in: path
- *         name: id 
- *         schema: 
- *           type: string
- *         required: true
- *         description: visitor id
- */
- app.get('/visitor/:id', async (req, res) => {
+app.delete('/delete/visitor', async (req, res) => {
+	const del = await Visitor.delete(req.body.username)
+
+	res.json({del})
+
+})
+
+app.get('/visitor/:id', async (req, res) => {
 	console.log(req.params.id);
 
 	res.status(200).json({})
