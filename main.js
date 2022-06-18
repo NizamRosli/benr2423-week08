@@ -1,6 +1,8 @@
 const MongoClient = require("mongodb").MongoClient;
 const User = require("./user");
 const Visitor = require("./visitor");
+const Inmate = require("./inmate");
+const Visitorlog = require("./visitorlog")
 
 MongoClient.connect(
 	// TODO: Connection 
@@ -13,6 +15,8 @@ MongoClient.connect(
 	console.log('Connected to MongoDB');
 	User.injectDB(client);
 	Visitor.injectDB(client);
+	Inmate.injectDB(client);
+	Visitorlog.injectDB(client);
 })
 
 const express = require('express')
@@ -44,13 +48,112 @@ function verifyToken(req, res, next) {
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.get('/', (req, res) => {
-	res.send('Hello World')
-})
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+const options = {
+	definition: {
+		openapi: '3.0.0',
+		info: {
+			title: 'Prison Visitor Management System',
+			version: '1.0.0',
+		},
+		components:{
+			securitySchemes:{
+				jwt:{
+					type: 'http',
+					scheme: 'bearer',
+					in: "header",
+					bearerFormat: 'JWT'
+				}
+			},
+		security:[{
+			"jwt": []
+		}]
+		}
+	},
+	apis: ['./main.js'], 
+};
+const swaggerSpec = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get('/hello', (req, res) => {
-	res.send('Hello BENR2423')
-})
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         _id: 
+ *           type: string
+ *         username: 
+ *           type: string
+ *         name:
+ *           type: string
+ *         officerNo:
+ *           type: string
+ *         rank:
+ *           type: string
+ *         phone:
+ *           type: string
+ *     Visitor:
+ *       type: object
+ *       propeties:
+ *         _id: 
+ *           type: string
+ *         username: 
+ *           type: string
+ *         age:
+ *           type: int32
+ *         gender:
+ *           type: string
+ *         address:
+ *           type: string
+ *         relation:
+ *           type: string          
+ *     Inmate:
+ *       type: object
+ *       propeties:
+ *         _id: 
+ *           type: string
+ *         Inmateno:
+ *           type: string
+ *         Firstname: 
+ *           type: string
+ *         Lastname: 
+ *           type: string
+ *         age:
+ *           type: int32
+ *         gender:
+ *           type: string
+ *             
+ */
+
+/**
+ * @swagger
+ * /login/user:
+ *   post:
+ *     description: User Login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Invalid username or password
+ */
 
 app.post('/login/user', async (req, res) => {
 	console.log(req.body);
@@ -73,6 +176,33 @@ app.post('/login/user', async (req, res) => {
 	});
 })
 
+/**
+ * @swagger
+ * /login/visitor:
+ *   post:
+ *     description: Visitor Login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Visitor'
+ *       401:
+ *         description: Invalid username or password
+ */
+
 app.post('/login/visitor', async (req, res) => {
 	console.log(req.body);
 
@@ -91,9 +221,45 @@ app.post('/login/visitor', async (req, res) => {
 		age: user.Age,
 		gender: user.Gender,
 		address: user.Address,
-		relation: user.Relation
+		relation: user.Relation,
+		token: generateAccessToken({ username: user.username })
 	});
 })
+
+/**
+ * @swagger
+ * /register/user:
+ *   post:
+ *     description: User Registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               name: 
+ *                 type: string
+ *               officerNo:
+ *                 type: string
+ *               rank:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: There is an error during registration , Please try again
+ */
 
 app.post('/register/user', async (req, res) => {
 	console.log(req.body);
@@ -104,6 +270,43 @@ app.post('/register/user', async (req, res) => {
 	res.json({reg})
 })
 
+/**
+ * @swagger
+ * /register/visitor:
+ *   post:
+ *     description: Visitor Registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               name: 
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               gender:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               relation:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Visitor'
+ *       401:
+ *         description: There is an error during registration , Please try again
+ */
+
 app.post('/register/visitor', async (req, res) => {
 	console.log(req.body);
 
@@ -113,31 +316,311 @@ app.post('/register/visitor', async (req, res) => {
 	res.json({reg})
 })
 
-app.patch('/login/update', async (req, res) => {
-	console.log(req.body);
-
-	const log = await User.login(req.body.username, req.body.password);
-	//console.log(log.status);
-
-	if (log.status == ('invalid username' || 'invalid password')) {
-		res.status(401).send("invalid username or password")
-	}
-	const update = await User.update(req.body.username,req.body.name, req.body.officerno, req.body.rank, req.body.phone);
-	res.json({update})
-
-})
-
 app.use(verifyToken);
 
-app.delete('/delete/user', async (req, res) => {
-	const del = await User.delete(req.body.username)
+/**
+ * @swagger
+ * /register/inmate:
+ *   post:
+ *     security:
+ *      - jwt: []
+ *     description: Inmate Registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               Inmateno: 
+ *                 type: string
+ *               Firstname: 
+ *                 type: string
+ *               Lastname: 
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               gender:
+ *                 type: string
+ *              
+ *     responses:
+ *       200:
+ *         description: Successful registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Inmate'
+ *       401:
+ *         description: There is an error during registration , Please try again
+ */
 
-	res.json({del})
+ app.post('/register/inmate', async (req,res)=>{
+	console.log(req.body)
+
+	const reg = await Inmate.register(req.body.Inmateno, req.body.Firstname, req.body.Lastname, req.body.age, req.body.gender );
+console.log(reg);
+
+res.json({reg})
 
 })
 
+/**
+ * @swagger
+ * /user/update:
+ *   patch:
+ *     security:
+ *      - jwt: []
+ *     description: User Update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               name: 
+ *                 type: string
+ *               officerNo:
+ *                 type: string
+ *               rank:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: There is an error during updating , Please try again
+ */
+
+app.patch('/user/update', async (req, res) => {
+	console.log(req.body);
+
+	if (req.user.rank == "officer"){
+		const update = await User.update(req.body.username, req.body.name, req.body.phone);
+		res.status(200).send(update)
+	}
+	else{
+		res.status(403).send("You are unauthorized")
+	}
+
+})
+
+/**
+ * @swagger
+ * /visitor/update:
+ *   patch:
+ *     security:
+ *      - jwt: []
+ *     description: Visitor Update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               name: 
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               gender:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               relation:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: There is an error during updating , Please try again
+ */
+
+app.patch('/visitor/update', async (req, res) => {
+	console.log(req.body);
+
+	if (req.user.username == req.body.username){
+		const update = await Visitor.update(req.body.username, req.body.name, req.body.age, req.body.gender, req.body.address, req.body.relation);
+		res.status(200).send(update)
+	}
+	else{
+		res.status(403).send("You are unauthorized")
+	}
+})
+
+/**
+ * @swagger
+ * /inmate/update:
+ *   patch:
+ *     security:
+ *      - jwt: []
+ *     description: Inmate Update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               Inmateno: 
+ *                 type: string
+ *               Firstname: 
+ *                 type: string
+ *               Lastname: 
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               gender:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Inamte'
+ *       401:
+ *         description: There is an error during updating , Please try again
+ */
+
+ app.patch('/inmate/update', async (req, res) => {
+	console.log(req.body);
+	if (req.user.rank == "officer"){
+		const update = await Inmate.update( req.body.Inmateno, req.body.Firstname, req.body.Lastname, req.body.age, req.body.gender);
+		res.status(200).send(update)
+	}
+	else{
+		res.status(403).send("You are unauthorized")
+	}
+})
+
+/**
+ * @swagger
+ * /delete/user:
+ *   delete:
+ *     security:
+ *      - jwt: []
+ *     description: User Update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               
+ *     responses:
+ *       200:
+ *         description: Successful delete
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: There is an error during deleting , Please try again
+ */
+
+app.delete('/delete/user', async (req, res) => {
+	if (req.user.rank == "officer"){
+		const del = await User.delete(req.body.username)
+		res.status(200).send(del)
+	}
+	else{
+		res.status(403).send("You are unauthorized")
+	}
+})
+
+/**
+ * @swagger
+ * /delete/visitor:
+ *   delete:
+ *     security:
+ *      - jwt: []
+ *     description: Delete Visitor
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               username: 
+ *                 type: string
+ *               
+ *     responses:
+ *       200:
+ *         description: Successful deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Visitor'
+ *       401:
+ *         description: There is an error during deleting , Please try again
+ */
+
 app.delete('/delete/visitor', async (req, res) => {
-	const del = await Visitor.delete(req.body.username)
+	if (req.user.rank == "officer"){
+		const del = await Visitor.delete(req.body.username)
+		res.status(200).send(del)
+	}
+	else{
+		res.status(403).send("You are unauthorized")
+	}
+})
+
+/**
+ * @swagger
+ * /delete/Inmate:
+ *   delete:
+ *     security:
+ *      - jwt: []
+ *     description: Delete Inmate
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: 
+ *             type: object
+ *             properties:
+ *               Inmateno: 
+ *                 type: string
+ *               
+ *     responses:
+ *       200:
+ *         description: Successful deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Inmate'
+ *       401:
+ *         description: There is an error during deleting , Please try again
+ */
+
+ app.delete('/delete/inmate', async (req, res) => {
+	const del = await Inmate.delete(req.body.Inmateno)
 
 	res.json({del})
 

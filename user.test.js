@@ -38,14 +38,13 @@ describe("User Account Management", () => {
 
 	test("User login successfully", async () => {
 		const res = await User.login("test", "password")
-		expect(res).not.toEqual(
+		expect(res).toEqual(
 			expect.objectContaining({
-				_id: expect.any(String),
 				username: expect.any(String),
         Password: expect.any(String),
 				HashedPassword: expect.any(String),
         Name: expect.any(String),
-        //OfficerNo: expect.any(Int32Array),
+        OfficerNo: expect.any(Number),
         Rank: expect.any(String),
         Phone: expect.any(String),
 			})

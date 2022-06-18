@@ -2,19 +2,19 @@ const supertest = require('supertest');
 const request = supertest('http://localhost:3030');
 
 describe('Express Route Test', function () {
-	it('should return hello world', async () => {
-		return request.get('/hello')
-			.expect(200)
-			.expect('Content-Type', /text/)
-			.then(res => {
-				expect(res.text).toBe('Hello BENR2423');
-			});
-	})
+	// it('should return hello world', async () => {
+	// 	return request.get('/hello')
+	// 		.expect(200)
+	// 		.expect('Content-Type', /text/)
+	// 		.then(res => {
+	// 			expect(res.text).toBe('Hello BENR2423');
+	// 		});
+	// })
 
 	it('user login successfully', async () => {
 		return request
 			.post('/login/user')
-			.send({username: "string", password: "string" })
+			.send({username: "test123", password: "password" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
 				expect(response.body).toEqual(
@@ -29,7 +29,7 @@ describe('Express Route Test', function () {
 			});
 	});
 
-	it('user login successfully', async () => {
+	it('visitor login successfully', async () => {
 		return request
 			.post('/login/visitor')
 			.send({username: "helloworld", password: "string" })
@@ -39,7 +39,7 @@ describe('Express Route Test', function () {
 					expect.objectContaining({
 						username: expect.any(String),
 						name: expect.any(String),
-						//age: expect.any(int32),
+						age: expect.any(Number),
 						gender: expect.any(String),
 						address: expect.any(String),
 						relation: expect.any(String),

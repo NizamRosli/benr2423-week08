@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt")
 let users;
-
+// /
 class User {
 	static async injectDB(conn) {
 		users = await conn.db("Prison_VMS").collection("users")
@@ -37,7 +37,6 @@ class User {
 							"Phone": phone,});
 	}
 
-
 	static async login(username, password) {
 			// TODO: Check if username exists
 			const result = await users.findOne({username: username});
@@ -56,11 +55,9 @@ class User {
 				
 	}
 	
-		static async update(username, name, officerno, rank, phone){
+		static async update(username, name, phone){
 				return users.updateOne({username:username},{$set:{
 				"Name": name,
-				"OfficerNo": officerno,
-				"Rank": rank,
 				"Phone": phone,}})
 		}
 

@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt")
 let visitors;
-
+// 
 class Visitor {
 	static async injectDB(conn) {
 		visitors = await conn.db("Prison_VMS").collection("visitors")
