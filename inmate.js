@@ -34,7 +34,7 @@ class Inmate {
 			return inmate.deleteOne({Inmateno: Inmateno})
 		}
 
-        static async find(Inmateno) {
+    static async find(Inmateno) {
 			return inmate.findOne({Inmateno: Inmateno})
 		}
 

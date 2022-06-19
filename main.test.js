@@ -32,7 +32,7 @@ describe('Express Route Test', function () {
 	it('visitor login successfully', async () => {
 		return request
 			.post('/login/visitor')
-			.send({username: "helloworld", password: "string" })
+			.send({username: "test123", password: "password" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
 				expect(response.body).toEqual(  
@@ -41,7 +41,11 @@ describe('Express Route Test', function () {
 						name: expect.any(String),
 						age: expect.any(Number),
 						gender: expect.any(String),
-						address: expect.any(String),
+						// Address: expect.objectContaining({
+						// 	Road: expect.any(String),
+						// 	Zipcode: expect.any(Number),
+						// 	State: expect.any(String)
+						// }),
 						relation: expect.any(String),
 					})
 				);
@@ -73,14 +77,16 @@ describe('Express Route Test', function () {
 
 	it('register visitor', async () => {
 		return request
-			.post('/register/user')
+			.post('/register/visitor')
 			.send({
 				username: "testing",
 				password: "password",
 				name: "aishah",
 				age: 23,
 				gender: "female",
-				address: "no 2 jalan tuah 76100 melaka",
+				road: "no 2 jalan tuah",
+				zipcode: 76100,
+				state: "melaka",
 				relation: "husband" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {

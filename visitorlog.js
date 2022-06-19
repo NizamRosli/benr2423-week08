@@ -5,7 +5,7 @@ class Visitorlog {
 		visitorlog = await conn.db("Prison_VMS").collection("visitorlog")
 	}
 
-	static async register(Logno, username, inmateid, Dateofvisit, Timein, Timeout, Purpose, Officerid, Insertby) {
+	static async register(Logno, username, inmateno, Dateofvisit, Timein, Timeout, Purpose, Officerno, Insertby) {
 		// TODO: Check if Logno exists
 		const res = await visitorlog.findOne({ Logno: Logno })
 
@@ -17,26 +17,24 @@ class Visitorlog {
 				return await visitorlog.insertOne({
               "Logno":Logno,
               "username": username,
-							"Inmateid": inmateid,
+							"InmateNo": inmateno,
 							"Dateofvisit": Dateofvisit,
 							"Timein": Timein,
 							"Timeout": Timeout,			
               "Purpose": Purpose,
-              "OfficeNo":Officerid,
+              "OfficeNo":Officerno,
               "Insertby":Insertby			
             });
 	}
 
-		static async update(Logno, visitorid,inmateid,Dateofvisit,Timein,Timeout,Purpose,Officerid,Insertby){
+		static async update(Logno, Dateofvisit,Timein,Timeout,Purpose,Officerno,Insertby){
 				return visitorlog.updateOne({ Logno: Logno },{$set:{
-                            "Visitorid": visitorid,
-							"Inmateid": inmateid,
 							"Dateofvisit": Dateofvisit,
 							"Timein": Timein,
 							"Timeout": Timeout,			
-                            "Purpose": Purpose,
-                            "Officeid":Officerid,
-                            "Insertby":Insertby				}})
+              "Purpose": Purpose,
+              "OfficeNo":Officerno,
+              "Insertby":Insertby				}})
 		}
 
 		static async delete(Logno) {

@@ -17,7 +17,7 @@ describe("User Account Management", () => {
 	})
 
 	test("New visitor registration", async () => {
-		 const res = await Visitor.register("test", "password", "nizam", 23, "male", "no 1 jalan tuah 76100 melaka", "uncle")
+		 const res = await Visitor.register("test", "password", "nizam", 23, "male", "no 1 jalan tuah", 76100, "melaka", "uncle")
 		expect(res.insertedId).not.toBeUndefined();
 	})
 
@@ -46,7 +46,11 @@ describe("User Account Management", () => {
         Name: expect.any(String),
         Age: expect.any(Number),
         Gender: expect.any(String),
-        Address: expect.any(String),
+        Address: expect.objectContaining({
+					Road: expect.any(String),
+					Zipcode: expect.any(Number),
+					State: expect.any(String)
+				}),
         Relation: expect.any(String)
       })
     );
