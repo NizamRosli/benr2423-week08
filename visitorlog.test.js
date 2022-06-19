@@ -18,7 +18,7 @@ describe("User Account Management", () => {
 
 	test("New visitorlog registration", async () => {
 		 const res = await Visitorlog.register( 1, "mirul", 1234, "12 jun 2022", "9:00", "11:00", "miss", 345, "azfan")
-		expect(res.insertedId).not.toBeUndefined();
+		 expect(res).toEqual({ "status": "Succesfully register visitorlog" })
 	})
 
 	test("Duplicate visitorlog", async () => {

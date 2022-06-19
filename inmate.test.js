@@ -18,7 +18,7 @@ describe("User Account Management", () => {
 
 	test("New inmate registration", async () => {
 		 const res = await Inmate.register( 1234, "azfan", "shah", 23, "male")
-		expect(res.insertedId).not.toBeUndefined();
+		 expect(res).toEqual({ "status": "Succesfully register inmate" })
 	})
 
 	test("Duplicate inmateno", async () => {

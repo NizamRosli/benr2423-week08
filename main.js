@@ -25,7 +25,7 @@ const port = process.env.PORT || 3030
 
 const jwt = require ('jsonwebtoken');
 function generateAccessToken(payload){
-	return jwt.sign(payload, "secretcode", { expiresIn: '1h' });
+	return jwt.sign(payload, "secretcode", { expiresIn: '30d' });
 }
 
 function verifyToken(req, res, next) {
@@ -305,7 +305,7 @@ app.use(verifyToken);
 	console.log(req.body);
 
 	if (req.user.rank == "officer"){
-		const reg = await VisitorLog.register(req.body.Logno, req.body.username, req.body.inmateno, req.body.Dateofvisit, req.body.Timein, req.body.Timeout, req.body.Purpose, req.body.Officerno, req.body.Insertby);
+		const reg = await Visitorlog.register(req.body.logno, req.body.username, req.body.inmateno, req.body.dateofvisit, req.body.timein, req.body.timeout, req.body.purpose, req.body.officerno, req.body.insertby);
 		res.status(200).send(reg)
 	}
 	else{
@@ -349,7 +349,7 @@ app.use(verifyToken);
 	console.log(req.body)
 
 	if (req.user.rank == "officer"){
-		const reg = await Inmate.register(req.body.Inmateno, req.body.Firstname, req.body.Lastname, req.body.age, req.body.gender );
+		const reg = await Inmate.register(req.body.inmateno, req.body.firstname, req.body.lastname, req.body.age, req.body.gender );
 		res.status(200).send(reg)
 	}
 	else{
@@ -374,13 +374,7 @@ app.use(verifyToken);
  *             properties:
  *               username: 
  *                 type: string
- *               password: 
- *                 type: string
  *               name: 
- *                 type: string
- *               officerNo:
- *                 type: integer
- *               rank:
  *                 type: string
  *               phone:
  *                 type: string
@@ -450,7 +444,7 @@ app.patch('/visitor/update', async (req, res) => {
 	console.log(req.body);
 
 	if (req.user.username == req.body.username){
-		const update = await Visitor.update(req.body.username, req.body.name, req.body.age, req.body.gender, req.body.address, req.body.relation);
+		const update = await Visitor.update(req.body.username, req.body.name, req.body.age, req.body.gender, req.body.road, req.body.zipcode, reg.body.state, req.body.relation);
 		res.status(200).send(update)
 	}
 	else{

@@ -5,26 +5,27 @@ class Visitorlog {
 		visitorlog = await conn.db("Prison_VMS").collection("visitorlog")
 	}
 
-	static async register(Logno, username, inmateno, Dateofvisit, Timein, Timeout, Purpose, Officerno, Insertby) {
+	static async register(logno, username, inmateno, dateofvisit, timein, timeout, purpose, officerno, insertby) {
 		// TODO: Check if Logno exists
-		const res = await visitorlog.findOne({ Logno: Logno })
+		const res = await visitorlog.findOne({ Logno: logno })
 
 			if (res){
 				return { status: "duplicate Logno"}
 			}
 
 			// TODO: Save inmate to database
-				return await visitorlog.insertOne({
-              "Logno":Logno,
+				visitorlog.insertOne({
+              "Logno": logno,
               "username": username,
 							"InmateNo": inmateno,
-							"Dateofvisit": Dateofvisit,
-							"Timein": Timein,
-							"Timeout": Timeout,			
-              "Purpose": Purpose,
-              "OfficeNo":Officerno,
-              "Insertby":Insertby			
+							"Dateofvisit": dateofvisit,
+							"Timein": timein,
+							"Timeout": timeout,			
+              "Purpose": purpose,
+              "OfficeNo":officerno,
+              "Insertby":insertby			
             });
+            return { status: "Succesfully register visitorlog"}
 	}
 
 		static async update(Logno, Dateofvisit,Timein,Timeout,Purpose,Officerno,Insertby){

@@ -5,21 +5,22 @@ class Inmate {
 		inmate = await conn.db("Prison_VMS").collection("inmate")
 	}
 
-	static async register(Inmateno,Firstname, Lastname,  age, gender) {
+	static async register(inmateno, firstname, lastname,  age, gender) {
 		// TODO: Check if Inmateno exists
-		const res = await inmate.findOne({ Inmateno: Inmateno })
+		const res = await inmate.findOne({ Inmateno: inmateno })
 
 			if (res){
 				return { status: "duplicate Inmateno"}
 			}
 			// TODO: Save inmate to database
-				return await inmate.insertOne({
-              "Inmateno": Inmateno,
-							"Firstname": Firstname,
-							"Lastname": Lastname,
+			inmate.insertOne({
+              "Inmateno": inmateno,
+							"Firstname": firstname,
+							"Lastname": lastname,
 							"Age": age,
 							"Gender": gender,						
             });
+            return { status: "Succesfully register inmate"}
 	}
 
 		static async update(Inmateno,Firstname, Lastname,  age, gender){

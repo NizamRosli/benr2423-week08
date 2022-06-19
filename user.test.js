@@ -13,12 +13,12 @@ describe("User Account Management", () => {
 
 	afterAll(async () => {
 		await User.delete("test");
-		await client.close();
+		//await client.close();
 	})
 
 	test("New user registration", async () => {
 		const res = await User.register("test", "password", "nizam", 345, "admin", "0123456789")
-		expect(res.insertedId).not.toBeUndefined();
+		expect(res).toEqual({ "status": "Succesfully register user" })
 	})
 
 	test("Duplicate username", async () => {

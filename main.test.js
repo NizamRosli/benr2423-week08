@@ -1,15 +1,9 @@
 const supertest = require('supertest');
 const request = supertest('http://localhost:3030');
+const user_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyYW5rIjoib2ZmaWNlciIsImlhdCI6MTY1NTY0ODMxMiwiZXhwIjoxNjU1NjUxOTEyfQ.6QKJ-R7bsffj0izJ3d4kO_O389ICDiBuW8F0E3XPxmo';
+const visitor_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxMjMiLCJpYXQiOjE2NTU2NDgyODUsImV4cCI6MTY1NTY1MTg4NX0.nLkQ8eTGAE6X-2BVCItxElqtaq_HeE7i4bFJtCZTDRs';
 
 describe('Express Route Test', function () {
-	// it('should return hello world', async () => {
-	// 	return request.get('/hello')
-	// 		.expect(200)
-	// 		.expect('Content-Type', /text/)
-	// 		.then(res => {
-	// 			expect(res.text).toBe('Hello BENR2423');
-	// 		});
-	// })
 
 	it('user login successfully', async () => {
 		return request
@@ -52,8 +46,6 @@ describe('Express Route Test', function () {
 			});
 	});
 
-	// it('login failed', async () => {
-	// })
 
 	it('register user', async () => {
 		return request
@@ -67,11 +59,7 @@ describe('Express Route Test', function () {
 				phone: "0178456789" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
-				expect(response.body).not.toEqual(
-					expect.objectContaining({
-						insertedId: expect.any(String),
-					})
-				);
+				expect(response.body.reg.status).toEqual("Succesfully register user")
 			});
 	});
 
@@ -90,29 +78,71 @@ describe('Express Route Test', function () {
 				relation: "husband" })
 			.expect('Content-Type', /json/)
 			.expect(200).then(response => {
-				expect(response.body).not.toEqual(
-					expect.objectContaining({
-						insertedId: expect.any(String),
-					})
-				);
+				expect(response.body.reg.status).toEqual("Succesfully register Visitor")
 			});
 	});
 
-	// it('login successfully', async () => {
+	it('register inmate', async () => {
+		return request
+			.post('/register/inmate')
+			.set('authorization', 'Bearer '+ user_token) //set token to header
+			.send({
+				inmateno: 13,
+				firstname: "test",
+				lastname: "uji",
+				age: 33,
+			  gender: "male", })
+			.expect('Content-Type', /json/)
+			.expect(200).then(response => {
+				expect(response.body.status).toEqual("Succesfully register inmate")
+			});
+	});
+
+	it('register visitorlog', async () => {
+		return request
+			.post('/register/visitorlog')
+			.set('authorization', 'Bearer '+ user_token) //set token to header
+			.send({
+				logno: 12,
+        username: "azfan",
+				inmateno: 23,
+				dateofvisit: "12 jun 2022",
+				timein: "9:00",
+				timeout: "12:00",			
+        purpose: "miss",
+        officerno: 1234,
+        insertby: "nizam" })
+			.expect('Content-Type', /json/)
+			.expect(200).then(response => {
+				expect(response.body.status).toEqual("Succesfully register visitorlog")
+			});
+	});
+
+	// it('user update', async () => {
 	// 	return request
-	// 		.patch('/login/update')
-	// 		.send({username: 'user1', password: "test" })
-	// 		.send({name: 'Nizam', phone: '0136797035', officeno: '1234'})
+	// 		.patch('/user/update')
+	// 		.set('authorization', 'Bearer '+ user_token) //set token to header
+	// 		.send({
+	// 			username: "azfan",
+	// 		  name: "test", 
+	// 			phone: "0123476789"})
 	// 		.expect('Content-Type', /json/)
 	// 		.expect(200).then(response => {
-	// 			expect(response.body).toEqual(
-	// 				expect.objectContaining({
-	// 					_id: expect.any(String),
-	// 					Name: expect.any(String),
-	// 					Phone: expect.any(Number),
-	// 					Email: expect.any(Number),
-	// 				})
-	// 			);
+	// 			expect(response.body.reg.status).toEqual("Information updated");
+	// 		});
+	// });
+
+	// it('visitor update', async () => {
+	// 	return request
+	// 		.patch('/visitor/update')
+	// 		.set('authorization', 'Bearer '+ visitor_token) //set token to header
+	// 		.send({
+	// 			username: "azfan",
+	// 		  name: "test", 
+	// 			phone: "0123476789"})
+	// 		.expect('Content-Type', /json/)
+	// 		.expect(200).then(response => {
+	// 			expect(response.body.reg.status).toEqual("Information updated");
 	// 		});
 	// });
 

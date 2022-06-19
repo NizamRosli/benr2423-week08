@@ -27,7 +27,7 @@ class Visitor {
 			const hash = await bcrypt.hash(password, salt)
 
 			// TODO: Save user to database
-				return await visitors.insertOne({
+			visitors.insertOne({
 							"username": username,
 							"Password": password,
 							"HashedPassword": hash,
@@ -40,6 +40,7 @@ class Visitor {
 								"State":State},
               "Relation": relation
             });
+			return { status: "Succesfully register Visitor"}
 	}
 
 
@@ -62,7 +63,7 @@ class Visitor {
 	}
 	
 		static async update(username, name, age, gender, Road, Zipcode, State, relation){
-				return visitors.updateOne({username:username},{$set:{
+				visitors.updateOne({username:username},{$set:{
 				"Name": name,
 				"Age": age,
 				"Gender": gender,
@@ -71,10 +72,12 @@ class Visitor {
 					"Zipcode":Zipcode,
 					"State":State},
         "Relation": relation}})
+				return { status: "Information updated"}
 		}
 
 		static async delete(username) {
-			return visitors.deleteOne({username: username})
+			visitors.deleteOne({username: username})
+			return { status: "Visitor deleted!"}
 		}
 
 	}
